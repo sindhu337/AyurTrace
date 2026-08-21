@@ -1,0 +1,47 @@
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Backend (Java/Spring Boot)
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/uploads/
+
+# Web (React/Vite)
+ayurtrace_web/node_modules/
+ayurtrace_web/dist/
+ayurtrace_web/.env
+ayurtrace_web/.env.local
+ayurtrace_web/.env.development.local
+ayurtrace_web/.env.test.local
+ayurtrace_web/.env.production.local
+
+# Mobile (Flutter)
+ayurtrace_mobile/.gradle/
+ayurtrace_mobile/.dart_tool/
+ayurtrace_mobile/.flutter-plugins-dependencies
+ayurtrace_mobile/.pub-cache/
+ayurtrace_mobile/.pub/
+ayurtrace_mobile/build/
+ayurtrace_mobile/coverage/
+ayurtrace_mobile/android/.gradle/
+ayurtrace_mobile/android/app/build/
+ayurtrace_mobile/android/app/debug/
+ayurtrace_mobile/android/app/profile/
+ayurtrace_mobile/android/app/release/
+ayurtrace_mobile/.widget_preview/

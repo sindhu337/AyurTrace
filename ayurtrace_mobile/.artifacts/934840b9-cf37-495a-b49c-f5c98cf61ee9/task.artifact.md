@@ -1,0 +1,6 @@
+- [x] Update Backend: Add ping endpoint to `AuthController.java`
+- [x] Update Backend: Enable request logging in `application.properties`
+- [x] Update Mobile: Improve error handling in `auth_provider.dart`
+- [x] Update Mobile: Fix registration payload in `register_screen.dart`
+- [x] Update Mobile: Add "Test Connection" diagnostic to `register_screen.dart`
+- [x] Verify connectivity and registration flow

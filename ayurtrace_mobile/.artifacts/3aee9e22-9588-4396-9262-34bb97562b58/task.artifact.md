@@ -1,0 +1,3 @@
+- [x] Create Flyway migration `V3__fix_cultivation_foreign_key.sql` in backend.
+- [x] Verify backend startup and migration application.
+- [x] Test cultivation save from mobile app (manual verification).

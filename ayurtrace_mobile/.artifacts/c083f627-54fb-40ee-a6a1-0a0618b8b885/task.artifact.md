@@ -1,0 +1,4 @@
+- [x] Fix Traceability import in `traceability_timeline_screen.dart`
+- [x] Fix type mismatch in `farmer_dashboard.dart` for `addCultivation`
+- [x] Fix type mismatch in `farmer_dashboard.dart` for `createBatch`
+- [x] Verify build succeeds (Static analysis passed, Gradle environment issue noted)
