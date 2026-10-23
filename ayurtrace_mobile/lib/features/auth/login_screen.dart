@@ -1,7 +1,11 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'auth_provider.dart';
 import '../../core/theme/app_theme.dart';
+
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,7 +42,12 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(authProvider.errorMessage ?? 'Login failed. Please check your credentials.')),
+          SnackBar(
+            content: Text(
+              authProvider.errorMessage ??
+                  'Login failed. Please check your credentials.',
+            ),
+          ),
         );
       }
     }
@@ -50,9 +59,20 @@ class _LoginScreenState extends State<LoginScreen> {
     IconData icon = widget.role == 'FARMER' ? Icons.badge : Icons.phone;
 
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.role} Login')),
+      appBar: AppBar(
+        title: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('AyurTrace', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Secure Herbal Supply Chain', style: TextStyle(fontSize: 9)),
+          ],
+        ),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
         padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
@@ -73,7 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   prefixIcon: Icon(icon),
                 ),
                 validator: (value) => value!.isEmpty ? 'Enter $label' : null,
-                keyboardType: widget.role == 'CUSTOMER' ? TextInputType.phone : TextInputType.text,
+                keyboardType: widget.role == 'CUSTOMER'
+                    ? TextInputType.phone
+                    : TextInputType.text,
               ),
               const SizedBox(height: 20),
               TextFormField(
