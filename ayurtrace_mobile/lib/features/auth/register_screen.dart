@@ -3,11 +3,8 @@ import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../core/constants/india_states.dart';
-import 'package:dio/dio.dart' as dio;
-import '../../core/config/api_config.dart';
 
 class RegisterScreen extends StatefulWidget {
   final String role;
@@ -33,7 +30,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Farmer specific
   final _aadhaarController = TextEditingController();
-  PlatformFile? _rtcFile;
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
   String _locationMode = 'Manual'; // 'GPS' or 'Manual'
@@ -107,39 +103,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  Future<void> _pickRTCFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-    );
-
-    if (result != null) {
-      setState(() {
-        _rtcFile = result.files.first;
-      });
-    }
-  }
-
-  Future<String?> _uploadRTC(PlatformFile file) async {
-    try {
-      dio.FormData formData = dio.FormData.fromMap({
-        "file": await dio.MultipartFile.fromFile(file.path!, filename: file.name),
-      });
-
-      final response = await dio.Dio().post(
-        '${ApiConfig.baseUrl}/api/files/upload/rtc',
-        data: formData,
-      );
-
-      if (response.statusCode == 200) {
-        return (response.data as Map)['data']; // Returns the file path
-      }
-    } catch (e) {
-      debugPrint("RTC Upload Error: $e");
-    }
-    return null;
-  }
-
   void _testConnection() async {
     setState(() => _isLoading = true);
     final result = await context.read<AuthProvider>().checkConnection();
@@ -166,21 +129,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       setState(() => _isLoading = true);
 
-      String? rtcPath;
-      if (widget.role == 'FARMER') {
-        if (_rtcFile == null) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please upload RTC document')));
-          setState(() => _isLoading = false);
-          return;
-        }
-        rtcPath = await _uploadRTC(_rtcFile!);
-        if (rtcPath == null) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('RTC Upload failed')));
-          setState(() => _isLoading = false);
-          return;
-        }
-      }
-
       Map<String, dynamic> userData = {
         'fullName': _fullNameController.text,
         'email': _emailController.text,
@@ -196,7 +144,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (widget.role == 'FARMER') {
         userData.addAll({
           'aadharNo': _aadhaarController.text,
-          'rtcDocument': rtcPath,
           'gpsCoordinates': _locationMode == 'GPS' 
               ? '${_latitudeController.text},${_longitudeController.text}'
               : null,
@@ -306,48 +253,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (value) => value!.length != 12 ? 'Enter 12-digit Aadhaar' : null,
                   keyboardType: TextInputType.number,
                 ),
-                const SizedBox(height: 24),
-                const Text('RTC DOCUMENT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.green)),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Column(
-                    children: [
-                      if (_rtcFile != null) ...[
-                        Row(
-                          children: [
-                            const Icon(Icons.description, color: Colors.green),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(_rtcFile!.name, overflow: TextOverflow.ellipsis),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close, color: Colors.red),
-                              onPressed: () => setState(() => _rtcFile = null),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        TextButton(onPressed: _pickRTCFile, child: const Text('Change Document')),
-                      ] else ...[
-                        const Text('Upload your Land Record (RTC) document'),
-                        const SizedBox(height: 12),
-                        ElevatedButton.icon(
-                          onPressed: _pickRTCFile,
-                          icon: const Icon(Icons.upload_file),
-                          label: const Text('UPLOAD RTC DOCUMENT'),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.green),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
               ],
               if (widget.role == 'CUSTOMER') ...[
                 DropdownButtonFormField<String>(
