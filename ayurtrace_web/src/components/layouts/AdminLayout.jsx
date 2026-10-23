@@ -29,16 +29,16 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="admin-shell flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-ayur-900 flex flex-col transition-transform duration-300
+        fixed inset-y-0 left-0 z-50 w-64 bg-ayur-900 flex flex-col transition-transform duration-300 admin-sidebar
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:flex
       `}>
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-ayur-800">
-          <div className="w-9 h-9 bg-ayur-500 rounded-lg flex items-center justify-center">
+        <div className="flex items-center gap-3 px-5 py-5 border-b border-ayur-800 admin-brand">
+          <div className="w-9 h-9 bg-ayur-500 rounded-lg flex items-center justify-center admin-brand-mark">
             <Leaf className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -88,7 +88,7 @@ export default function AdminLayout({ children }) {
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shrink-0">
+        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shrink-0 admin-topbar">
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -100,11 +100,24 @@ export default function AdminLayout({ children }) {
             <span className="font-semibold text-ayur-700">AYURTRACE</span>
             <ChevronRight className="w-4 h-4" />
             <span>Admin</span>
+            <ChevronRight className="w-4 h-4" />
+            <span className="font-medium text-gray-700">Dashboard</span>
+          </div>
+          <div className="ml-auto flex items-center gap-4 text-sm text-gray-500">
+            <span className="hidden sm:inline">{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <button className="relative rounded-full p-2 hover:bg-gray-100" aria-label="Notifications">
+              <Bell className="h-5 w-5 text-gray-600" />
+              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
+            </button>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ayur-600 font-semibold text-white">
+              {(user?.username || 'A').charAt(0).toUpperCase()}
+            </span>
+            <span className="hidden font-semibold text-ayur-900 sm:inline">Hi, Admin</span>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto admin-main">
           {children}
         </main>
       </div>

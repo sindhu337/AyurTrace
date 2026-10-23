@@ -3,34 +3,47 @@ import { useNavigate, Link } from 'react-router-dom'
 import {
   Leaf, Shield, Globe, Zap, ChevronRight, Menu, X,
   Microscope, TreePine, Factory, Users, QrCode, BarChart3,
-  CheckCircle, ArrowRight, Lock
+  CheckCircle, ArrowRight, Lock, LogIn, UserPlus
 } from 'lucide-react'
 
 export default function HomePage() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [authAction, setAuthAction] = useState(null)
 
   return (
     <div className="min-h-screen bg-white font-sans">
       {/* ── Navbar ─────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
+      <nav className="sticky top-0 z-50 border-b border-ayur-100 bg-[#fffdf7]/95 shadow-sm backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex h-[4.25rem] items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-ayur-700 rounded-lg flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-ayur-800">
+                <Leaf className="h-6 w-6 text-herb-200" />
               </div>
-              <span className="text-xl font-extrabold text-ayur-800 tracking-tight">AYURTRACE</span>
+              <span className="text-xl font-extrabold tracking-tight text-ayur-900">AYURTRACE</span>
             </div>
 
-            {/* Hamburger Button (desktop and mobile) */}
-            <button 
-              className="p-2 rounded-lg hover:bg-gray-100 text-gray-700 focus:outline-none transition-colors duration-200" 
+            <div className="hidden items-center gap-8 text-sm font-semibold text-gray-700 lg:flex">
+              <a href="#" className="border-b-2 border-ayur-700 pb-1 text-ayur-800">Home</a>
+              <a href="#about" className="transition hover:text-ayur-700">About</a>
+              <a href="#features" className="transition hover:text-ayur-700">Traceability</a>
+              <a href="#how-it-works" className="transition hover:text-ayur-700">Herbs</a>
+              <a href="#contact" className="transition hover:text-ayur-700">Contact</a>
+              <button
+                onClick={() => document.getElementById('trace')?.scrollIntoView({ behavior: 'smooth' })}
+                className="flex items-center gap-2 rounded-xl bg-herb-400 px-5 py-3 text-ayur-950 shadow-sm transition hover:bg-herb-300"
+              >
+                <QrCode className="h-4 w-4" /> Quick Trace
+              </button>
+            </div>
+            <button
+              className="rounded-lg p-2 text-gray-700 transition hover:bg-ayur-50 lg:hidden"
               onClick={() => setMenuOpen(true)}
               aria-label="Open Menu"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="h-6 w-6" />
             </button>
           </div>
         </div>
@@ -127,15 +140,25 @@ export default function HomePage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-ayur-900 via-ayur-800 to-ayur-700 text-white overflow-hidden">
+      <section
+        className="relative overflow-hidden text-white"
+        style={{
+          background: 'linear-gradient(135deg, #063b27 0%, #12643b 48%, #326f36 100%)',
+        }}
+      >
         {/* Decorative circles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5" />
           <div className="absolute top-1/2 -left-32 w-80 h-80 rounded-full bg-white/5" />
           <div className="absolute -bottom-16 right-1/3 w-64 h-64 rounded-full bg-herb-500/20" />
+          <div className="absolute -bottom-32 left-1/4 h-80 w-[38rem] rounded-[50%] bg-[#5b8730]/40 blur-sm" />
+          <div className="absolute -bottom-40 right-[-8rem] h-96 w-96 rounded-full bg-[#d0a741]/20 blur-3xl" />
+          <div className="absolute left-[-3rem] top-24 h-48 w-48 rounded-full border-[2rem] border-[#8db45d]/20 blur-sm" />
+          <div className="absolute right-10 top-10 text-7xl opacity-20">🌿</div>
+          <div className="absolute bottom-6 right-8 text-8xl opacity-30">🌿</div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text */}
             <div>
@@ -143,55 +166,128 @@ export default function HomePage() {
                 <Zap className="w-3.5 h-3.5 text-herb-300" />
                 Blockchain-Powered Traceability
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+              <h1 className="mb-6 text-5xl font-extrabold leading-[0.95] sm:text-6xl lg:text-7xl">
                 AYURTRACE
-                <span className="block text-herb-300 text-3xl sm:text-4xl font-bold mt-2">
-                  From Farm to Formulation
+                <span className="mt-4 block font-serif text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+                  From Farm to <span className="text-herb-300">Formulation</span>
                 </span>
               </h1>
-              <p className="text-ayur-100 text-lg leading-relaxed mb-8 max-w-xl">
+              <div className="mb-5 h-1 w-12 bg-herb-300" />
+              <p className="mb-8 max-w-xl text-lg leading-relaxed text-ayur-100">
                 Blockchain-Based Geo-Tagged Traceability System for Ayurvedic Medicinal Herbs.
                 Ensuring authenticity, purity, and transparency across the entire supply chain.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => navigate('/manufacturer/register')}
-                  className="btn-primary bg-herb-500 hover:bg-herb-600 flex items-center justify-center gap-2 text-base py-3 px-6"
-                >
-                  Register as Manufacturer <ArrowRight className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => navigate('/manufacturer/login')}
-                  className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-base"
-                >
-                  Manufacturer Login
-                </button>
-              </div>
+              {authAction === null ? (
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={() => setAuthAction('login')}
+                    className="group btn-primary bg-herb-500 hover:bg-herb-400 text-ayur-950 flex items-center justify-center gap-2 text-base py-3 px-7 shadow-lg shadow-herb-900/20"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Login
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+                  <button
+                    onClick={() => setAuthAction('register')}
+                    className="group bg-white/10 hover:bg-white/20 border border-white/35 text-white font-semibold py-3 px-7 rounded-lg transition-all text-base flex items-center justify-center gap-2 backdrop-blur-sm"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Register
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-full max-w-xl rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-md">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-base font-bold text-white">
+                      {authAction === 'login' ? 'Login as' : 'Register as'}
+                    </p>
+                    <button
+                      onClick={() => setAuthAction(null)}
+                      className="rounded-full p-1 text-white/70 transition hover:bg-white/10 hover:text-white"
+                      aria-label="Back to login and register options"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {authAction === 'login' ? (
+                      <>
+                        <button
+                          onClick={() => navigate('/admin/login')}
+                          className="group flex items-center justify-between rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-left text-white transition hover:bg-white/20"
+                        >
+                          <span className="flex items-center gap-3">
+                            <Shield className="h-5 w-5 text-herb-300" />
+                            <span className="font-semibold">Admin Login</span>
+                          </span>
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </button>
+                        <button
+                          onClick={() => navigate('/manufacturer/login')}
+                          className="group flex items-center justify-between rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-left text-white transition hover:bg-white/20"
+                        >
+                          <span className="flex items-center gap-3">
+                            <Factory className="h-5 w-5 text-herb-300" />
+                            <span className="font-semibold">Manufacturer Login</span>
+                          </span>
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          disabled
+                          title="Admin registration is managed by the system"
+                          className="flex cursor-not-allowed items-center gap-3 rounded-xl border border-white/15 bg-black/10 px-4 py-3 text-left text-white/50"
+                        >
+                          <Shield className="h-5 w-5" />
+                          <span>
+                            <span className="block font-semibold">Register as Admin</span>
+                            <span className="block text-xs text-white/40">Managed by the system</span>
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => navigate('/manufacturer/register')}
+                          className="group flex items-center justify-between rounded-xl border border-herb-300/50 bg-herb-500 px-4 py-3 text-left text-ayur-950 transition hover:bg-herb-400"
+                        >
+                          <span className="flex items-center gap-3">
+                            <UserPlus className="h-5 w-5" />
+                            <span className="font-semibold">Register as Manufacturer</span>
+                          </span>
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Illustration card */}
-            <div className="hidden lg:block">
-              <div className="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-8">
-                <div className="space-y-4">
-                  {[
-                    { icon: TreePine,  label: 'Farmer',       sub: 'Geo-tagged cultivation',   color: 'text-herb-300' },
-                    { icon: Leaf,      label: 'Batch',        sub: 'AYR-BATCH-000001',          color: 'text-ayur-300' },
-                    { icon: Factory,   label: 'Manufacturer', sub: 'AYM000001 — Approved',      color: 'text-blue-300' },
-                    { icon: QrCode,    label: 'QR Code',      sub: 'AYR-QR-000001',             color: 'text-purple-300' },
-                    { icon: Users,     label: 'Customer',     sub: 'Scans & verifies product',  color: 'text-pink-300' },
-                  ].map(({ icon: Icon, label, sub, color }, i) => (
-                    <div key={i} className="flex items-center gap-4">
-                      {i > 0 && <div className="absolute ml-5 -mt-6 w-px h-4 bg-white/20" />}
-                      <div className="relative w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
-                        <Icon className={`w-5 h-5 ${color}`} />
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold text-sm">{label}</p>
-                        <p className="text-ayur-300 text-xs">{sub}</p>
-                      </div>
-                      {i < 4 && <ChevronRight className="ml-auto w-4 h-4 text-white/30" />}
-                    </div>
-                  ))}
+            {/* Welcome message */}
+            <div className="hidden justify-center lg:flex">
+              <div className="relative w-full max-w-md rounded-3xl border border-white/50 bg-[#f4f5dc]/75 p-10 text-center text-ayur-950 shadow-2xl backdrop-blur-md">
+                <div className="absolute -right-5 -top-5 h-24 w-24 rounded-full bg-herb-400/20 blur-2xl" />
+                <div className="absolute -bottom-8 -left-5 h-28 w-28 rounded-full bg-ayur-400/20 blur-2xl" />
+                <div className="relative">
+                  <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-herb-300/40 bg-herb-300/15">
+                    <Leaf className="h-10 w-10 text-ayur-700" />
+                  </div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-ayur-950">
+                    Every herb has a story.
+                  </p>
+                  <p className="mt-1 text-2xl font-bold leading-snug text-ayur-950">
+                    <span className="block text-ayur-700">We help you verify it.</span>
+                  </p>
+                  <p className="mt-4 text-sm leading-relaxed text-ayur-900">
+                    Secure, transparent, and trusted traceability from cultivation to formulation.
+                  </p>
+                  <div className="mt-8 grid grid-cols-3 gap-2 border-t border-ayur-800/20 pt-6 text-xs font-semibold text-ayur-900">
+                    <span><Leaf className="mx-auto mb-2 h-6 w-6 text-ayur-700" />Cultivation</span>
+                    <span><Factory className="mx-auto mb-2 h-6 w-6 text-ayur-700" />Processing</span>
+                    <span><Shield className="mx-auto mb-2 h-6 w-6 text-ayur-700" />Verification</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -200,17 +296,22 @@ export default function HomePage() {
       </section>
 
       {/* ── Stats Bar ──────────────────────────────────────────────── */}
-      <section className="bg-ayur-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+      <section id="trace" className="relative overflow-hidden rounded-t-[2rem] bg-[#f4f6e8] text-ayur-950 shadow-[0_-8px_25px_rgba(15,70,37,0.12)]">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-7 sm:grid-cols-4 sm:gap-6">
           {[
-            { value: '100%', label: 'Traceable Supply Chain' },
-            { value: 'BCrypt', label: 'Secure Authentication' },
-            { value: 'QR',    label: 'Instant Product Scan' },
-            { value: 'GPS',   label: 'Geo-Tagged Cultivation' },
-          ].map(({ value, label }) => (
-            <div key={label}>
-              <div className="text-2xl font-bold text-herb-300">{value}</div>
-              <div className="text-xs text-ayur-200 mt-1">{label}</div>
+            { value: '100%', label: 'Traceable Supply Chain', icon: Leaf },
+            { value: 'BCrypt', label: 'Secure Authentication', icon: Lock },
+            { value: 'QR',    label: 'Instant Product Scan', icon: QrCode },
+            { value: 'GPS',   label: 'Geo-Tagged Cultivation', icon: Globe },
+          ].map(({ value, label, icon: Icon }) => (
+            <div key={label} className="flex items-center justify-center gap-3 border-ayur-800/15 text-center sm:border-r last:border-0">
+              <div className="hidden h-12 w-12 items-center justify-center rounded-full bg-[#dceacb] sm:flex">
+                <Icon className="h-6 w-6 text-ayur-800" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-ayur-950">{value}</div>
+                <div className="mt-1 text-xs text-ayur-800">{label}</div>
+              </div>
             </div>
           ))}
         </div>
