@@ -22,6 +22,7 @@ const AdminFarmers                = lazy(() => import('./pages/admin/AdminFarmer
 const AdminManufacturers          = lazy(() => import('./pages/admin/AdminManufacturers'))
 const AdminNotifications          = lazy(() => import('./pages/admin/AdminNotifications'))
 const AdminProfile                = lazy(() => import('./pages/admin/AdminProfile'))
+const AdminBatches                = lazy(() => import('./pages/admin/AdminBatches'))
 
 // Manufacturer pages
 const ManufacturerDashboard       = lazy(() => import('./pages/manufacturer/ManufacturerDashboard'))
@@ -62,6 +63,7 @@ export default function App() {
                     <Route path="manufacturer-applications"    element={<AdminManufacturerApplications />} />
                     <Route path="farmers"                      element={<AdminFarmers />} />
                     <Route path="manufacturers"                element={<AdminManufacturers />} />
+                    <Route path="batches"                      element={<AdminBatches />} />
                     <Route path="notifications"                element={<AdminNotifications />} />
                     <Route path="profile"                      element={<AdminProfile />} />
                     <Route path="*"                            element={<Navigate to="dashboard" replace />} />

@@ -16,10 +16,12 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
     Optional<Batch> findByQrCode(String qrCode);
     List<Batch> findByStatus(BatchStatus status);
 
+    List<Batch> findByStatusOrderByIdDesc(BatchStatus status);
+
     @Query("SELECT b FROM Batch b JOIN FETCH b.cultivation c JOIN FETCH c.farmer WHERE c.farmer.id = :farmerId")
     List<Batch> findByFarmerId(Long farmerId);
 
-    @Query("SELECT b FROM Batch b JOIN FETCH b.cultivation c JOIN FETCH c.farmer f WHERE f.supervisorId = :manufacturerId")
+    @Query("SELECT b FROM Batch b JOIN FETCH b.cultivation c JOIN FETCH c.farmer f JOIN FETCH b.assignedManufacturer m WHERE m.id = :manufacturerId")
     List<Batch> findByAssignedManufacturerId(Long manufacturerId);
 
     /** Full load for traceability: batch + cultivation + farmer */

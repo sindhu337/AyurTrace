@@ -326,24 +326,35 @@ public class ManufacturerService {
     @Transactional(readOnly = true)
     public List<BatchResponse> getBatchesForManufacturer(String manufacturerId) {
         ManufacturerLogin ml = resolveLogin(manufacturerId);
-        List<Farmer> farmers = farmerRepository.findBySupervisorId(ml.getRegistration().getId());
-        return farmers.stream()
-                .flatMap(f -> batchRepository.findByFarmerId(f.getId()).stream())
+        return batchRepository.findByAssignedManufacturerId(ml.getRegistration().getId()).stream()
                 .map(BatchResponse::from)
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public List<BatchResponse> getAllBatches() {
-        return batchRepository.findAll().stream()
-                .map(BatchResponse::from).collect(Collectors.toList());
-    }
-
     @Transactional
-    public BatchResponse updateBatchStatus(Long batchId, String status) {
-        Batch batch = batchRepository.findById(batchId)
+    public BatchResponse updateBatchStatus(String manufacturerId, Long batchId, String status) {
+        ManufacturerLogin login = resolveLogin(manufacturerId);
+        Batch batch = batchRepository.findByIdWithFull(batchId)
                 .orElseThrow(() -> new RuntimeException("Batch not found: " + batchId));
-        batch.setStatus(BatchStatus.valueOf(status));
+        if (batch.getAssignedManufacturer() == null ||
+                !batch.getAssignedManufacturer().getId().equals(login.getRegistration().getId())) {
+            throw new RuntimeException("Batch is not assigned to this manufacturer.");
+        }
+        BatchStatus next;
+        try {
+            next = BatchStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Unsupported batch status.");
+        }
+        if (next == BatchStatus.APPROVED || next == BatchStatus.REJECTED ||
+                next == BatchStatus.CREATED || next == BatchStatus.SUBMITTED) {
+            throw new RuntimeException("Manufacturer cannot set that batch status.");
+        }
+        if (batch.getStatus() != BatchStatus.RECEIVED &&
+                next != BatchStatus.PROCESSING && next != BatchStatus.COMPLETED) {
+            throw new RuntimeException("Invalid manufacturer batch transition.");
+        }
+        batch.setStatus(next);
         batchRepository.save(batch);
         return BatchResponse.from(batch);
     }

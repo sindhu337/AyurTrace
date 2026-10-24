@@ -63,9 +63,17 @@ public class FarmerService {
     // ─── Batch ────────────────────────────────────────────────────────────────
 
     @Transactional
-    public Batch createBatch(Long cultivationId, Batch batchDetails) {
-        Cultivation cultivation = cultivationRepository.findById(cultivationId)
+    public Batch createBatch(Long cultivationId, Batch batchDetails, Farmer farmer) {
+        Cultivation cultivation = cultivationRepository.findByIdWithFarmer(cultivationId)
                 .orElseThrow(() -> new RuntimeException("Cultivation not found with id: " + cultivationId));
+        if (!cultivation.getFarmer().getId().equals(farmer.getId())) {
+            throw new RuntimeException("You can only create a batch from your own cultivation.");
+        }
+        if (cultivation.getStatus() == CultivationStatus.HARVESTED ||
+                batchRepository.findByFarmerId(farmer.getId()).stream()
+                        .anyMatch(existing -> existing.getCultivation().getId().equals(cultivationId))) {
+            throw new RuntimeException("A batch already exists for this cultivation.");
+        }
 
         Batch batch = new Batch();
         batch.setCultivation(cultivation);
@@ -86,7 +94,7 @@ public class FarmerService {
         batch.setLongitude(batchDetails.getLongitude());
         batch.setNotes(batchDetails.getNotes());
         batch.setQrCode("QR-" + batchNumber);
-        batch.setStatus(BatchStatus.CREATED);
+        batch.setStatus(BatchStatus.SUBMITTED);
 
         cultivation.setStatus(CultivationStatus.HARVESTED);
         cultivationRepository.save(cultivation);

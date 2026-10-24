@@ -32,6 +32,11 @@ public class BatchResponse {
     private String farmerName;
     private String farmerDistrict;
     private String farmerState;
+    private Long assignedManufacturerId;
+    private String assignedManufacturerName;
+    private java.time.LocalDateTime assignedAt;
+    private java.time.LocalDateTime reviewedAt;
+    private String rejectionReason;
 
     public static BatchResponse from(Batch b) {
         BatchResponse r = new BatchResponse();
@@ -46,6 +51,13 @@ public class BatchResponse {
         r.setNotes(b.getNotes());
         r.setQrCode(b.getQrCode());
         r.setStatus(b.getStatus());
+        r.setAssignedAt(b.getAssignedAt());
+        r.setReviewedAt(b.getReviewedAt());
+        r.setRejectionReason(b.getRejectionReason());
+        if (b.getAssignedManufacturer() != null) {
+            r.setAssignedManufacturerId(b.getAssignedManufacturer().getId());
+            r.setAssignedManufacturerName(b.getAssignedManufacturer().getCompanyName());
+        }
         if (b.getCultivation() != null) {
             r.setCultivationId(b.getCultivation().getId());
             r.setHerbName(b.getCultivation().getHerbName());

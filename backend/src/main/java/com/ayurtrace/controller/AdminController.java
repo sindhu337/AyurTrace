@@ -1,11 +1,13 @@
 package com.ayurtrace.controller;
 
 import com.ayurtrace.dto.ApiResponse;
+import com.ayurtrace.dto.BatchReviewRequest;
 import com.ayurtrace.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.ayurtrace.entity.BatchStatus;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -19,6 +21,49 @@ public class AdminController {
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashboard() {
         return ResponseEntity.ok(adminService.getDashboardStats());
+    }
+
+    @GetMapping("/batches")
+    public ResponseEntity<?> getBatches(@RequestParam(required = false) BatchStatus status) {
+        return ResponseEntity.ok(adminService.getBatches(status));
+    }
+
+    @GetMapping("/batches/{id}")
+    public ResponseEntity<?> getBatch(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(adminService.getBatch(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/batches/{id}/approve")
+    public ResponseEntity<?> approveBatch(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(adminService.approveBatch(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/batches/{id}/reject")
+    public ResponseEntity<?> rejectBatch(@PathVariable Long id,
+                                         @RequestBody BatchReviewRequest request) {
+        try {
+            return ResponseEntity.ok(adminService.rejectBatch(id, request.getReason()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/batches/{id}/assign/{manufacturerId}")
+    public ResponseEntity<?> assignBatch(@PathVariable Long id,
+                                         @PathVariable Long manufacturerId) {
+        try {
+            return ResponseEntity.ok(adminService.assignBatch(id, manufacturerId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     // ─── Farmer Applications ─────────────────────────────────────────────────

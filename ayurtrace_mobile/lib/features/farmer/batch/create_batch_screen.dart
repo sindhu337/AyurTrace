@@ -25,15 +25,30 @@ class _CreateBatchScreenState extends State<CreateBatchScreen> {
   final _notesController = TextEditingController();
 
   bool _isLoading = false;
+  late Future<List<Cultivation>> _cultivationsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final farmerId = context.read<AuthProvider>().userId ?? '';
+    _cultivationsFuture = context.read<FarmerService>().getCultivations(farmerId);
+  }
+
+  @override
+  void dispose() {
+    _qtyController.dispose();
+    _locationController.dispose();
+    _gpsController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final farmerId = context.watch<AuthProvider>().userId ?? '';
-    
     return Scaffold(
       appBar: AppBar(title: const Text('Create Batch')),
       body: FutureBuilder<List<Cultivation>>(
-        future: context.read<FarmerService>().getCultivations(farmerId),
+        future: _cultivationsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
           final cultivations = (snapshot.data ?? []).where((c) => c.status != 'HARVESTED').toList();
@@ -118,7 +133,7 @@ class _CreateBatchScreenState extends State<CreateBatchScreen> {
                   _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
-                          onPressed: _create,
+                          onPressed: _isLoading ? null : _create,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryColor,
                             minimumSize: const Size(double.infinity, 50),
@@ -154,16 +169,28 @@ class _CreateBatchScreenState extends State<CreateBatchScreen> {
   }
 
   void _create() async {
+    if (_isLoading) return;
     if (_formKey.currentState!.validate() && _selectedCultivationId != null) {
+      final quantity = double.tryParse(_qtyController.text.trim());
+      final gpsParts = _gpsController.text.split(',');
+      final latitude = gpsParts.length == 2 ? double.tryParse(gpsParts[0].trim()) : null;
+      final longitude = gpsParts.length == 2 ? double.tryParse(gpsParts[1].trim()) : null;
+      if (quantity == null || quantity <= 0 || latitude == null || longitude == null ||
+          latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Enter valid quantity and GPS coordinates.')),
+        );
+        return;
+      }
       setState(() => _isLoading = true);
       try {
         final data = {
-          'quantity': double.tryParse(_qtyController.text) ?? 0,
+          'quantity': quantity,
           'quantityUnit': _qtyUnit,
           'harvestDate': _harvestDate.toIso8601String().split('T')[0],
           'location': _locationController.text,
-          'latitude': _gpsController.text.contains(',') ? double.parse(_gpsController.text.split(',')[0].trim()) : 0,
-          'longitude': _gpsController.text.contains(',') ? double.parse(_gpsController.text.split(',')[1].trim()) : 0,
+          'latitude': latitude,
+          'longitude': longitude,
           'notes': _notesController.text,
         };
         await context.read<FarmerService>().createBatch(_selectedCultivationId!, data);
@@ -186,9 +213,9 @@ class _CreateBatchScreenState extends State<CreateBatchScreen> {
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Batch created successfully!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Batch submitted successfully!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             SizedBox(height: 8),
-            Text('The batch has been added to your inventory.'),
+            Text('The batch is waiting for admin review.'),
           ],
         ),
         actions: [

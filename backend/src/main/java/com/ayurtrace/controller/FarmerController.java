@@ -68,8 +68,13 @@ public class FarmerController {
 
     @PostMapping("/batch")
     public ResponseEntity<?> createBatch(@RequestParam Long cultivationId,
-                                         @RequestBody Batch batch) {
-        return ResponseEntity.ok(farmerService.createBatch(cultivationId, batch));
+                                         @RequestBody Batch batch,
+                                         Principal principal) {
+        return ResponseEntity.ok(farmerService.createBatch(
+                cultivationId,
+                batch,
+                farmerRepository.findByUsername(principal.getName())
+                        .orElseThrow(() -> new RuntimeException("Farmer not found"))));
     }
 
     @GetMapping("/batches")

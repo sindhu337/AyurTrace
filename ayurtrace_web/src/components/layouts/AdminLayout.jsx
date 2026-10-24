@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard, Users, Factory, ClipboardList, Bell,
-  UserCircle, LogOut, Menu, X, Leaf, ChevronRight, UserCheck
+  UserCircle, LogOut, Menu, X, Leaf, ChevronRight, UserCheck, Package
 } from 'lucide-react'
 import ConfirmDialog from '../ui/ConfirmDialog'
 
@@ -13,6 +13,7 @@ const navItems = [
   { to: '/admin/manufacturer-applications',icon: ClipboardList,   label: 'Manufacturer Applications' },
   { to: '/admin/farmers',                  icon: Users,           label: 'Farmers' },
   { to: '/admin/manufacturers',            icon: Factory,         label: 'Manufacturers' },
+  { to: '/admin/batches',                  icon: Package,         label: 'Batch Review' },
   { to: '/admin/notifications',            icon: Bell,            label: 'Notifications' },
   { to: '/admin/profile',                  icon: UserCircle,      label: 'Profile' },
 ]

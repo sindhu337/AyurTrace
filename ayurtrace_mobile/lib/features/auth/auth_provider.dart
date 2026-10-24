@@ -13,11 +13,13 @@ class AuthProvider with ChangeNotifier {
   AuthStatus _status = AuthStatus.unauthenticated;
   String? _userRole;
   String? _userId;
+  String? _userName;
   String? _errorMessage;
 
   AuthStatus get status => _status;
   String? get userRole => _userRole;
   String? get userId => _userId;
+  String? get userName => _userName;
   String? get errorMessage => _errorMessage;
 
   Future<bool> login(String identifier, String password, String role) async {
@@ -51,6 +53,15 @@ class AuthProvider with ChangeNotifier {
         await _secureStorage.saveToken(token);
         await _secureStorage.saveUserRole(_userRole!);
         await _secureStorage.saveUserId(_userId!);
+
+        if (_userRole == 'ROLE_FARMER') {
+          _userName = await _fetchFarmerName();
+          if (_userName != null) {
+            await _secureStorage.saveUserName(_userName!);
+          }
+        } else {
+          _userName = null;
+        }
 
         _status = AuthStatus.authenticated;
         notifyListeners();
@@ -146,6 +157,7 @@ class AuthProvider with ChangeNotifier {
     _status = AuthStatus.unauthenticated;
     _userRole = null;
     _userId = null;
+    _userName = null;
     _errorMessage = null;
     notifyListeners();
   }
@@ -155,10 +167,37 @@ class AuthProvider with ChangeNotifier {
     if (token != null) {
       _userRole = await _secureStorage.getUserRole();
       _userId = await _secureStorage.getUserId();
+      _userName = await _secureStorage.getUserName();
+      if (_userRole == 'ROLE_FARMER' &&
+          (_userName == null || _userName!.trim().isEmpty)) {
+        _userName = await _fetchFarmerName();
+        if (_userName != null) {
+          await _secureStorage.saveUserName(_userName!);
+        }
+      }
       _status = AuthStatus.authenticated;
     } else {
       _status = AuthStatus.unauthenticated;
     }
     notifyListeners();
+  }
+
+  Future<String?> _fetchFarmerName() async {
+    try {
+      final response = await _dioClient.dio.get(ApiConfig.farmerProfile);
+      final data = response.data;
+      if (data is Map) {
+        final fullName = data['fullName'];
+        if (fullName is String && fullName.trim().isNotEmpty) {
+          return fullName.trim();
+        }
+      }
+      debugPrint('Farmer profile did not contain a valid fullName.');
+    } on DioException catch (e) {
+      debugPrint('Farmer profile lookup failed: ${e.message}');
+    } catch (e) {
+      debugPrint('Unexpected farmer profile lookup error: $e');
+    }
+    return null;
   }
 }

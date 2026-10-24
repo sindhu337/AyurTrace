@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 public class AdminService {
@@ -91,6 +92,70 @@ public class AdminService {
         Farmer f = farmerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Farmer not found"));
         return FarmerResponse.from(f);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BatchResponse> getBatches(BatchStatus status) {
+        List<Batch> batches = status == null
+                ? batchRepository.findAll()
+                : batchRepository.findByStatusOrderByIdDesc(status);
+        return batches.stream().map(BatchResponse::from).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public BatchResponse getBatch(Long id) {
+        return BatchResponse.from(batchRepository.findByIdWithFull(id)
+                .orElseThrow(() -> new RuntimeException("Batch not found: " + id)));
+    }
+
+    @Transactional
+    public BatchResponse approveBatch(Long id) {
+        Batch batch = batchRepository.findByIdWithFull(id)
+                .orElseThrow(() -> new RuntimeException("Batch not found: " + id));
+        if (batch.getStatus() != BatchStatus.SUBMITTED) {
+            throw new RuntimeException("Only submitted batches can be approved.");
+        }
+        batch.setStatus(BatchStatus.APPROVED);
+        batch.setReviewedAt(LocalDateTime.now());
+        batch.setRejectionReason(null);
+        return BatchResponse.from(batchRepository.save(batch));
+    }
+
+    @Transactional
+    public BatchResponse rejectBatch(Long id, String reason) {
+        if (reason == null || reason.trim().isEmpty()) {
+            throw new RuntimeException("A rejection reason is required.");
+        }
+        Batch batch = batchRepository.findByIdWithFull(id)
+                .orElseThrow(() -> new RuntimeException("Batch not found: " + id));
+        if (batch.getStatus() != BatchStatus.SUBMITTED) {
+            throw new RuntimeException("Only submitted batches can be rejected.");
+        }
+        batch.setStatus(BatchStatus.REJECTED);
+        batch.setReviewedAt(LocalDateTime.now());
+        batch.setRejectionReason(reason.trim());
+        return BatchResponse.from(batchRepository.save(batch));
+    }
+
+    @Transactional
+    public BatchResponse assignBatch(Long id, Long manufacturerId) {
+        Batch batch = batchRepository.findByIdWithFull(id)
+                .orElseThrow(() -> new RuntimeException("Batch not found: " + id));
+        if (batch.getStatus() != BatchStatus.APPROVED) {
+            throw new RuntimeException("Only approved batches can be assigned.");
+        }
+        if (batch.getAssignedManufacturer() != null) {
+            throw new RuntimeException("Batch is already assigned.");
+        }
+        Manufacturer manufacturer = manufacturerRepository.findById(manufacturerId)
+                .orElseThrow(() -> new RuntimeException("Manufacturer not found."));
+        if (manufacturer.getStatus() != ManufacturerStatus.APPROVED) {
+            throw new RuntimeException("Manufacturer is not approved.");
+        }
+        batch.setAssignedManufacturer(manufacturer);
+        batch.setAssignedAt(LocalDateTime.now());
+        batch.setStatus(BatchStatus.RECEIVED);
+        return BatchResponse.from(batchRepository.save(batch));
     }
 
     @Transactional

@@ -17,10 +17,10 @@ const cardStyles = {
   orange: { icon: 'admin-stat-icon-orange', value: 'text-orange-900', arrow: 'bg-orange-50 text-orange-700' },
 }
 
-function DashboardStat({ label, value, icon: Icon, color }) {
+function DashboardStat({ label, value, icon: Icon, color, to }) {
   const style = cardStyles[color] || cardStyles.ayur
-  return (
-    <div className="admin-stat-card">
+  const card = (
+    <div className={`admin-stat-card ${to ? 'cursor-pointer' : ''}`}>
       <div className={`admin-stat-icon ${style.icon}`}><Icon className="h-6 w-6" /></div>
       <div className="min-w-0">
         <p className="admin-stat-label">{label}</p>
@@ -29,6 +29,7 @@ function DashboardStat({ label, value, icon: Icon, color }) {
       <span className={`admin-stat-arrow ${style.arrow}`}><ArrowRight className="h-4 w-4" /></span>
     </div>
   )
+  return to ? <Link to={to} className="block">{card}</Link> : card
 }
 
 export default function AdminDashboard() {
@@ -84,7 +85,7 @@ export default function AdminDashboard() {
         <section className="admin-section">
           <h2 className="admin-section-title"><Layers className="h-6 w-6" /> Platform Activity</h2>
           <div className="admin-stat-grid three">
-            <DashboardStat label="Total Batches" value={s.totalBatches} icon={Layers} color="purple" />
+            <DashboardStat label="Total Batches" value={s.totalBatches} icon={Layers} color="purple" to="/admin/batches" />
             <DashboardStat label="Total Products" value={s.totalProducts} icon={Package} color="orange" />
             <DashboardStat label="Total Orders" value={s.totalOrders} icon={ShoppingCart} color="blue" />
           </div>
@@ -98,6 +99,7 @@ export default function AdminDashboard() {
               { to: '/admin/manufacturer-applications', icon: ClipboardList, label: 'Review Manufacturer Applications', color: 'blue', badge: s.pendingManufacturers },
               { to: '/admin/farmers', icon: Users, label: 'Manage Farmers', color: 'green' },
               { to: '/admin/manufacturers', icon: Factory, label: 'Manage Manufacturers', color: 'purple' },
+              { to: '/admin/batches', icon: Layers, label: 'Review Batches', color: 'green' },
             ].map(({ to, icon: Icon, label, color, badge }) => (
               <Link key={to} to={to} className={`admin-action-card ${color}`}>
                 <span className="admin-action-icon"><Icon className="h-6 w-6" /></span>

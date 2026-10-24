@@ -42,6 +42,16 @@ public class Batch {
     @Column(unique = true)
     private String qrCode;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_manufacturer_id")
+    private Manufacturer assignedManufacturer;
+
+    private java.time.LocalDateTime assignedAt;
+    private java.time.LocalDateTime reviewedAt;
+
+    @Column(length = 1000)
+    private String rejectionReason;
+
     @Enumerated(EnumType.STRING)
     private BatchStatus status = BatchStatus.CREATED;
 }

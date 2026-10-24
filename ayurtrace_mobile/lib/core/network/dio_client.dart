@@ -38,9 +38,8 @@ class DioClient {
       ),
     );
 
-    // Add visual logger to see exactly what's happening
     _dio.interceptors.add(PrettyDioLogger(
-      requestHeader: true,
+      requestHeader: false,
       requestBody: true,
       responseBody: true,
       responseHeader: false,

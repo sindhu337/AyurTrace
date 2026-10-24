@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -83,16 +85,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _latitudeController.text = position.latitude.toString();
       _longitudeController.text = position.longitude.toString();
       
-      // Reverse Geocoding
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks.first;
-        setState(() {
-          _stateController.text = place.administrativeArea ?? '';
-          _districtController.text = place.subAdministrativeArea ?? place.locality ?? '';
-          _selectedState = place.administrativeArea;
-          _selectedDistrict = place.subAdministrativeArea ?? place.locality;
-        });
+      // The geocoding package does not provide a web implementation. GPS
+      // coordinates are still valid there and the address can be entered
+      // manually.
+      if (!kIsWeb) {
+        try {
+          final placemarks = await placemarkFromCoordinates(
+            position.latitude,
+            position.longitude,
+          );
+          if (!mounted || placemarks.isEmpty) return;
+
+          final place = placemarks.first;
+          setState(() {
+            _stateController.text = place.administrativeArea ?? '';
+            _districtController.text =
+                place.subAdministrativeArea ?? place.locality ?? '';
+            _selectedState = place.administrativeArea;
+            _selectedDistrict =
+                place.subAdministrativeArea ?? place.locality;
+          });
+        } on PlatformException {
+          // Reverse geocoding is optional; keep the detected coordinates.
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

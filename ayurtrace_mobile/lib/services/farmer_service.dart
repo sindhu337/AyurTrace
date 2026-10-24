@@ -36,8 +36,13 @@ class FarmerService with ChangeNotifier {
     return (response.data as List).map((e) => Batch.fromJson(e)).toList();
   }
 
-  Future<void> createBatch(String cultivationId, Map<String, dynamic> data) async {
-    await _dioClient.dio.post(ApiConfig.batch, queryParameters: {'cultivationId': cultivationId}, data: data);
+  Future<Map<String, dynamic>> createBatch(String cultivationId, Map<String, dynamic> data) async {
+    final response = await _dioClient.dio.post(
+      ApiConfig.batch,
+      queryParameters: {'cultivationId': cultivationId},
+      data: data,
+    );
+    return Map<String, dynamic>.from(response.data as Map);
   }
 
   Future<List<NotificationModel>> getNotifications() async {

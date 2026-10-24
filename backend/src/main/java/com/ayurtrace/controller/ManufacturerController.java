@@ -110,16 +110,13 @@ public class ManufacturerController {
         return ResponseEntity.ok(manufacturerService.getBatchesForManufacturer(principal.getName()));
     }
 
-    @GetMapping("/batches/all")
-    public ResponseEntity<?> getAllBatches() {
-        return ResponseEntity.ok(manufacturerService.getAllBatches());
-    }
-
     @PutMapping("/batches/{batchId}/status")
     public ResponseEntity<?> updateBatchStatus(@PathVariable Long batchId,
-                                               @RequestParam String status) {
+                                               @RequestParam String status,
+                                               Principal principal) {
         try {
-            return ResponseEntity.ok(manufacturerService.updateBatchStatus(batchId, status));
+            return ResponseEntity.ok(manufacturerService.updateBatchStatus(
+                    principal.getName(), batchId, status));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
